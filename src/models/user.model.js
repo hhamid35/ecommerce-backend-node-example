@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     userType: { type: String, enum: ['USER', 'ADMIN'], default: 'USER' },
     password: { type: String, required: true, select: true },
+    passwordChangedAt: { type: Date },
     token: { type: String },
     wishlist: [
       {
