@@ -110,6 +110,43 @@ const openapiSpec = {
           deliveredOn: { type: 'string' },
         },
       },
+      PasswordResetRequest: {
+        type: 'object',
+        required: ['email'],
+        properties: {
+          email: { type: 'string', format: 'email' },
+        },
+      },
+      ForgottenPasswordResetRequest: {
+        type: 'object',
+        required: ['email', 'otp', 'newPassword'],
+        properties: {
+          email: { type: 'string', format: 'email' },
+          otp: { type: 'string', pattern: '^\\d{6}$', description: 'Six-digit numeric OTP' },
+          newPassword: { type: 'string', format: 'password', minLength: 6 },
+        },
+      },
+      PasswordResetResponse: {
+        type: 'object',
+        properties: {
+          success: { type: 'boolean', example: true },
+          message: {
+            type: 'string',
+            example: 'If an account exists, reset instructions have been sent.',
+          },
+          data: {
+            type: 'object',
+            properties: {
+              expiresInMinutes: { type: 'integer', example: 10 },
+              deliveryMethod: { type: 'string', example: 'email' },
+            },
+          },
+          debugOtp: {
+            type: 'string',
+            description: 'Present only in non-production when an account exists',
+          },
+        },
+      },
     },
   },
   paths: {
@@ -229,6 +266,82 @@ const openapiSpec = {
           },
         },
         responses: { 200: { description: 'Password reset result' } },
+      },
+    },
+    '/forgot-password': {
+      post: {
+        tags: ['Auth'],
+        summary: 'Request a password recovery OTP by email',
+        description:
+          'Public endpoint. Returns the same neutral success response whether or not the email is registered.',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/PasswordResetRequest' },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: 'Neutral success response',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/PasswordResetResponse' },
+              },
+            },
+          },
+          400: {
+            description: 'Invalid email shape',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    success: { type: 'boolean', example: false },
+                    message: { type: 'string', example: 'Email is not valid' },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    '/reset-forgotten-password': {
+      post: {
+        tags: ['Auth'],
+        summary: 'Complete forgotten-password recovery with OTP',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/ForgottenPasswordResetRequest' },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: 'Password reset successfully',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    success: { type: 'boolean', example: true },
+                    message: { type: 'string', example: 'Password reset successfully' },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: 'Validation or invalid/expired OTP',
+          },
+          429: {
+            description: 'Too many invalid OTP attempts',
+          },
+        },
       },
     },
 

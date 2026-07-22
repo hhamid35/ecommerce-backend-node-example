@@ -37,6 +37,19 @@ const config = Object.freeze({
   // Uploads
   uploadDir: process.env.UPLOAD_DIR || 'public/uploads',
   maxUploadBytes: parseInt(process.env.MAX_UPLOAD_BYTES, 10) || 15 * 1024 * 1024, // 15 MB
+
+  // Password recovery
+  passwordResetOtpTtlMinutes: parseInt(process.env.PASSWORD_RESET_OTP_TTL_MINUTES, 10) || 10,
+  passwordResetOtpLength: parseInt(process.env.PASSWORD_RESET_OTP_LENGTH, 10) || 6,
+  passwordResetMaxAttempts: parseInt(process.env.PASSWORD_RESET_MAX_ATTEMPTS, 10) || 5,
+  passwordResetEmailFrom: process.env.PASSWORD_RESET_EMAIL_FROM || '',
+
+  // SMTP (password recovery emails)
+  smtpHost: process.env.SMTP_HOST || '',
+  smtpPort: parseInt(process.env.SMTP_PORT, 10) || 587,
+  smtpUser: process.env.SMTP_USER || '',
+  smtpPass: process.env.SMTP_PASS || '',
+  smtpSecure: process.env.SMTP_SECURE === 'true',
 });
 
 /**
@@ -59,6 +72,25 @@ function validateConfig() {
     }
     // eslint-disable-next-line no-console
     console.warn(`\u26A0\uFE0F  ${message}. See .env.example. The server may not function correctly.`);
+  }
+
+  if (config.isProduction) {
+    const productionRequired = [
+      ['PASSWORD_RESET_EMAIL_FROM', config.passwordResetEmailFrom],
+      ['SMTP_HOST', config.smtpHost],
+      ['SMTP_PORT', config.smtpPort ? String(config.smtpPort) : ''],
+      ['SMTP_USER', config.smtpUser],
+      ['SMTP_PASS', config.smtpPass],
+    ];
+    const productionMissing = productionRequired
+      .filter(([, value]) => !value)
+      .map(([name]) => name);
+
+    if (productionMissing.length > 0) {
+      throw new Error(
+        `Missing required production environment variables: ${productionMissing.join(', ')}`
+      );
+    }
   }
 }
 
