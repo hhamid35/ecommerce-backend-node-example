@@ -28,9 +28,9 @@ RUN mkdir -p public/uploads \
 # Run as the built-in non-root "node" user.
 USER node
 
-EXPOSE 3000
+EXPOSE 3002
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-  CMD curl -fsS http://localhost:${PORT:-3000}/health || exit 1
+  CMD curl -fsS http://localhost:${PORT:-3002}/health || exit 1
 
 CMD ["node", "src/server.js"]

@@ -22,7 +22,7 @@ const config = Object.freeze({
   isTest: NODE_ENV === 'test',
 
   // Server
-  port: parseInt(process.env.PORT, 10) || 3000,
+  port: parseInt(process.env.PORT, 10) || 3002,
 
   // Database
   dbConnectionString: process.env.DB_CON_STRING || '',

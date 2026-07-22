@@ -54,7 +54,7 @@ src/
 
    | Variable           | Required | Default          | Description                                    |
    | ------------------ | :------: | ---------------- | ---------------------------------------------- |
-   | `PORT`             |    no    | `3000`           | Port the server listens on                     |
+   | `PORT`             |    no    | `3002`           | Port the server listens on                     |
    | `NODE_ENV`         |    no    | `development`    | `development` \| `production` \| `test`        |
    | `DB_CON_STRING`    |  **yes** | –                | MongoDB connection string                      |
    | `TOKEN_KEY`        |  **yes** | –                | Secret used to sign JWTs                        |
@@ -72,7 +72,7 @@ src/
    npm start       # production mode
    ```
 
-4. Open the interactive docs at **http://localhost:3000/api-docs**.
+4. Open the interactive docs at **http://localhost:3002/api-docs**.
 
 ## API documentation
 
@@ -143,7 +143,7 @@ This starts the API and a local MongoDB, wiring `DB_CON_STRING` to the bundled
 docker build -t ecommerce-backend .
 
 # Run (pass configuration at runtime; never bake secrets into the image)
-docker run --rm -p 3000:3000 \
+docker run --rm -p 3002:3002 \
   -e DB_CON_STRING="your-mongodb-uri" \
   -e TOKEN_KEY="your-jwt-secret" \
   ecommerce-backend
@@ -159,13 +159,13 @@ reads its API base URL from the `EXPO_PUBLIC_API_URL` environment variable
 (falling back to `http://10.0.2.2:3002` for the Android emulator).
 
 To point the app at this backend during local development, set the base URL to
-match the port this server runs on. For example, if the API runs on port `3000`:
+match the port this server runs on. For example, if the API runs on port `3002`:
 
 ```bash
 # in the React Native project
-EXPO_PUBLIC_API_URL=http://10.0.2.2:3000 npx expo start   # Android emulator
+EXPO_PUBLIC_API_URL=http://10.0.2.2:3002 npx expo start   # Android emulator
 # or use your machine's LAN IP for a physical device:
-EXPO_PUBLIC_API_URL=http://192.168.1.50:3000 npx expo start
+EXPO_PUBLIC_API_URL=http://192.168.1.50:3002 npx expo start
 ```
 
 Compatibility notes:
