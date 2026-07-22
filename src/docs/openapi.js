@@ -75,6 +75,20 @@ const openapiSpec = {
           _id: { type: 'string' },
           title: { type: 'string' },
           sku: { type: 'string' },
+          skuNormalized: {
+            type: 'string',
+            readOnly: true,
+            description: 'Server-maintained normalized SKU for scan lookup',
+          },
+          externalId: {
+            type: 'string',
+            description: 'Optional external barcode or QR identifier',
+          },
+          externalIdNormalized: {
+            type: 'string',
+            readOnly: true,
+            description: 'Server-maintained normalized external ID for scan lookup',
+          },
           price: { type: 'number' },
           image: { type: 'string' },
           description: { type: 'string' },
@@ -232,6 +246,99 @@ const openapiSpec = {
       },
     },
 
+    '/products/resolve-scan': {
+      get: {
+        tags: ['Products'],
+        summary: 'Resolve a scanned barcode or QR code to a catalog product',
+        parameters: [
+          {
+            name: 'code',
+            in: 'query',
+            required: true,
+            schema: { type: 'string' },
+            description:
+              'Raw scanned barcode or QR payload. Trimmed, whitespace removed, uppercased for matching; leading zeroes preserved.',
+          },
+          {
+            name: 'format',
+            in: 'query',
+            required: false,
+            schema: { type: 'string' },
+            description:
+              'Scanner-reported format (qr, ean13, upca, etc.). Used for diagnostics only.',
+          },
+        ],
+        responses: {
+          200: {
+            description: 'Product found',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    success: { type: 'boolean', example: true },
+                    status: { type: 'integer', example: 200 },
+                    message: { type: 'string', example: 'product found' },
+                    data: { $ref: '#/components/schemas/Product' },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: 'Missing or invalid scan code',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    success: { type: 'boolean', example: false },
+                    status: { type: 'integer', example: 400 },
+                    code: { type: 'string', example: 'SCAN_CODE_REQUIRED' },
+                    message: { type: 'string', example: 'Scan code is required' },
+                    data: { type: 'null' },
+                  },
+                },
+              },
+            },
+          },
+          404: {
+            description: 'No matching product',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    success: { type: 'boolean', example: false },
+                    status: { type: 'integer', example: 404 },
+                    code: { type: 'string', example: 'PRODUCT_SCAN_NOT_FOUND' },
+                    message: { type: 'string', example: 'No product found for scanned code' },
+                    data: { type: 'null' },
+                  },
+                },
+              },
+            },
+          },
+          409: {
+            description: 'Multiple products match the scanned code',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    success: { type: 'boolean', example: false },
+                    status: { type: 'integer', example: 409 },
+                    code: { type: 'string', example: 'PRODUCT_SCAN_DUPLICATE' },
+                    message: { type: 'string', example: 'Multiple products match the scanned code' },
+                    data: { type: 'null' },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
     '/products': {
       get: {
         tags: ['Products'],
