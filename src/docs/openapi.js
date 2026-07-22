@@ -75,11 +75,24 @@ const openapiSpec = {
           _id: { type: 'string' },
           title: { type: 'string' },
           sku: { type: 'string' },
+          externalIds: { type: 'array', items: { type: 'string' } },
           price: { type: 'number' },
           image: { type: 'string' },
           description: { type: 'string' },
           quantity: { type: 'number' },
           category: { $ref: '#/components/schemas/Category' },
+        },
+      },
+      ScanResolveError: {
+        type: 'object',
+        properties: {
+          success: { type: 'boolean', example: false },
+          status: { type: 'integer' },
+          reason: {
+            type: 'string',
+            enum: ['INVALID_SCAN_CODE', 'PRODUCT_NOT_FOUND', 'DUPLICATE_SCAN_CODE'],
+          },
+          message: { type: 'string' },
         },
       },
       OrderItem: {
@@ -232,6 +245,63 @@ const openapiSpec = {
       },
     },
 
+    '/products/resolve': {
+      get: {
+        tags: ['Products'],
+        summary: 'Resolve a scanned barcode or QR payload to a product',
+        parameters: [
+          {
+            name: 'code',
+            in: 'query',
+            required: true,
+            schema: { type: 'string', maxLength: 512 },
+            description: 'Raw scanned barcode or QR payload',
+          },
+        ],
+        responses: {
+          200: {
+            description: 'Single product match',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    success: { type: 'boolean', example: true },
+                    status: { type: 'integer', example: 200 },
+                    message: { type: 'string', example: 'product resolved' },
+                    data: { $ref: '#/components/schemas/Product' },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: 'Invalid scan code',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ScanResolveError' },
+              },
+            },
+          },
+          404: {
+            description: 'No product match',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ScanResolveError' },
+              },
+            },
+          },
+          409: {
+            description: 'Duplicate scan code',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ScanResolveError' },
+              },
+            },
+          },
+        },
+      },
+    },
     '/products': {
       get: {
         tags: ['Products'],
