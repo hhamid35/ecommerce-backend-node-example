@@ -1,2 +1,60 @@
-# node_modules
-# public/uploads
+# Dependencies
+node_modules/
+
+# Build / cache
+dist/
+/build/
+.turbo/
+.cache/
+*.tsbuildinfo
+.parcel-cache/
+.vite/
+.next/
+out/
+coverage/
+.nyc_output/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.p12
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE / editor
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-workspace
+*.sublime-project
+.vscode/
+
+# Local tooling
+.vercel
+.netlify
+
+# Misc
+*.local
+.temp/
+tmp/
+.tmp/
+.cursor/
+# Agent workspaces (per-workflow Cursor workspaces)
+/workspaces
+workspaces/
