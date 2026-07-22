@@ -1,12 +1,23 @@
 {
-  "name": "backend-node",
-  "version": "1.0.0",
-  "description": "",
-  "main": "app.js",
+  "name": "ecommerce-backend-node",
+  "version": "2.0.0",
+  "description": "Production-ready Express + MongoDB ecommerce REST API with OpenAPI docs. Backend for the ecommerce React Native example app.",
+  "main": "src/server.js",
   "scripts": {
-    "start": "node app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "lint": "echo \"No linter configured\" && exit 0",
+    "test": "echo \"No tests specified\" && exit 0"
   },
+  "keywords": [
+    "express",
+    "mongodb",
+    "mongoose",
+    "ecommerce",
+    "rest-api",
+    "openapi",
+    "swagger"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/abidrazaa/backend-node.git"
@@ -19,18 +30,21 @@
   "homepage": "https://github.com/abidrazaa/backend-node#readme",
   "dependencies": {
     "bcryptjs": "^2.4.3",
-    "body-parser": "^1.20.0",
-    "bson": "^4.6.5",
     "cors": "^2.8.5",
-    "dotenv": "^16.0.1",
-    "express": "^4.18.1",
-    "jsonwebtoken": "^9.0.3",
-    "mongoose": "^6.4.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.5.1",
+    "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
-    "nodemon": "^3.1.14",
-    "path": "^0.12.7"
+    "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
   },
   "engines": {
-    "node": "16.16.0"
+    "node": ">=18.0.0"
   }
 }

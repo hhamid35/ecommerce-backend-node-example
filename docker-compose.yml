@@ -1,0 +1,38 @@
+# Convenience compose file for local development.
+# Runs the API together with a local MongoDB instance.
+#
+#   docker compose up --build
+#
+# The API reads configuration from the `.env` file (see .env.example).
+
+services:
+  api:
+    build: .
+    ports:
+      - "${PORT:-3000}:${PORT:-3000}"
+    environment:
+      NODE_ENV: production
+      PORT: ${PORT:-3000}
+      # Point at the bundled mongo service by default; override in .env.
+      DB_CON_STRING: ${DB_CON_STRING:-mongodb://mongo:27017/ecommerce}
+      TOKEN_KEY: ${TOKEN_KEY:-change-me-in-production}
+      TOKEN_EXPIRES_IN: ${TOKEN_EXPIRES_IN:-10h}
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
+    volumes:
+      # Persist uploaded images across container restarts.
+      - uploads:/usr/src/app/public/uploads
+    depends_on:
+      - mongo
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    restart: unless-stopped
+
+volumes:
+  uploads:
+  mongo-data:
