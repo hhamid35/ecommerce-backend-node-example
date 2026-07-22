@@ -75,6 +75,7 @@ const openapiSpec = {
           _id: { type: 'string' },
           title: { type: 'string' },
           sku: { type: 'string' },
+          externalId: { type: 'string', nullable: true, description: 'Optional scannable barcode or external identifier' },
           price: { type: 'number' },
           image: { type: 'string' },
           description: { type: 'string' },
@@ -232,6 +233,96 @@ const openapiSpec = {
       },
     },
 
+    '/products/scan': {
+      get: {
+        tags: ['Products'],
+        summary: 'Resolve a scanned product code',
+        description:
+          'Public catalog lookup by scanned barcode or QR value. Matches exactly against `sku` or `externalId`.',
+        parameters: [
+          {
+            name: 'code',
+            in: 'query',
+            required: true,
+            schema: { type: 'string', maxLength: 128 },
+            description: 'Scanned barcode or QR code value',
+          },
+        ],
+        responses: {
+          200: {
+            description: 'Product resolved from scanned code',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    success: { type: 'boolean', example: true },
+                    status: { type: 'integer', example: 200 },
+                    message: { type: 'string', example: 'product resolved from scanned code' },
+                    data: { $ref: '#/components/schemas/Product' },
+                    matchedField: { type: 'string', enum: ['sku', 'externalId'] },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: 'Missing, empty, or overlong scan code',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    success: { type: 'boolean', example: false },
+                    status: { type: 'integer', example: 400 },
+                    code: {
+                      type: 'string',
+                      enum: ['PRODUCT_SCAN_CODE_REQUIRED', 'PRODUCT_SCAN_CODE_TOO_LONG'],
+                    },
+                    message: { type: 'string' },
+                    data: { type: 'null' },
+                  },
+                },
+              },
+            },
+          },
+          404: {
+            description: 'No matching product',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    success: { type: 'boolean', example: false },
+                    status: { type: 'integer', example: 404 },
+                    code: { type: 'string', example: 'PRODUCT_SCAN_NOT_FOUND' },
+                    message: { type: 'string', example: 'No product found for scanned code' },
+                    data: { type: 'null' },
+                  },
+                },
+              },
+            },
+          },
+          409: {
+            description: 'Multiple products share the scanned code',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    success: { type: 'boolean', example: false },
+                    status: { type: 'integer', example: 409 },
+                    code: { type: 'string', example: 'PRODUCT_SCAN_DUPLICATE' },
+                    message: { type: 'string', example: 'Multiple products share this scanned code' },
+                    data: { type: 'null' },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
     '/products': {
       get: {
         tags: ['Products'],

@@ -5,7 +5,8 @@ const mongoose = require('mongoose');
 const productSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
-    sku: { type: String },
+    sku: { type: String, trim: true },
+    externalId: { type: String, trim: true },
     price: { type: Number, required: true },
     image: { type: String },
     description: { type: String },
@@ -14,5 +15,8 @@ const productSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+productSchema.index({ sku: 1 });
+productSchema.index({ externalId: 1 });
 
 module.exports = mongoose.model('product', productSchema);

@@ -3,6 +3,7 @@
 const express = require('express');
 const {
   getAllProducts,
+  resolveProductByScan,
   addProduct,
   updateProduct,
   deleteProduct,
@@ -11,6 +12,7 @@ const { isAdmin } = require('../middleware/auth.middleware');
 
 const router = express.Router();
 
+router.get('/products/scan', resolveProductByScan);
 router.get('/products', getAllProducts);
 router.post('/product', isAdmin, addProduct);
 router.post('/update-product', isAdmin, updateProduct);
