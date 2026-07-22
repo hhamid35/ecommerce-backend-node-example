@@ -110,6 +110,30 @@ const openapiSpec = {
           deliveredOn: { type: 'string' },
         },
       },
+      ForgotPasswordRequest: {
+        type: 'object',
+        required: ['email'],
+        properties: {
+          email: { type: 'string', format: 'email' },
+        },
+      },
+      CompletePasswordResetRequest: {
+        type: 'object',
+        required: ['email', 'otp', 'newPassword'],
+        properties: {
+          email: { type: 'string', format: 'email' },
+          otp: { type: 'string', pattern: '^[0-9]{6}$' },
+          newPassword: { type: 'string', format: 'password', minLength: 8 },
+        },
+      },
+      PasswordResetSuccess: {
+        type: 'object',
+        properties: {
+          success: { type: 'boolean', example: true },
+          message: { type: 'string' },
+          returnTo: { type: 'string', example: 'login' },
+        },
+      },
     },
   },
   paths: {
@@ -229,6 +253,58 @@ const openapiSpec = {
           },
         },
         responses: { 200: { description: 'Password reset result' } },
+      },
+    },
+    '/forgot-password': {
+      post: {
+        tags: ['Auth'],
+        summary: 'Request a password reset OTP by email',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/ForgotPasswordRequest' },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: 'Neutral success message (does not reveal account existence)',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/SuccessMessage' },
+              },
+            },
+          },
+          400: { description: 'Invalid email format' },
+          429: { description: 'Too many reset requests' },
+        },
+      },
+    },
+    '/complete-password-reset': {
+      post: {
+        tags: ['Auth'],
+        summary: 'Complete password reset with OTP and new password',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/CompletePasswordResetRequest' },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: 'Password reset completed',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/PasswordResetSuccess' },
+              },
+            },
+          },
+          400: { description: 'Invalid or expired OTP, or password validation failure' },
+          429: { description: 'Too many reset attempts' },
+        },
       },
     },
 

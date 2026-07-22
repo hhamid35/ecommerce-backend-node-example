@@ -7,7 +7,7 @@
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "lint": "echo \"No linter configured\" && exit 0",
-    "test": "echo \"No tests specified\" && exit 0"
+    "test": "node --test src/tests/**/*.test.js"
   },
   "keywords": [
     "express",
@@ -39,6 +39,7 @@
     "mongoose": "^8.5.1",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.16",
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {

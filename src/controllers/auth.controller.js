@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
 const { config } = require('../config/env');
 const asyncHandler = require('../utils/asyncHandler');
+const PasswordResetService = require('../services/passwordReset.service');
 
 const SALT_ROUNDS = 10;
 
@@ -148,6 +149,34 @@ const resetPassword = asyncHandler(async (req, res) => {
   return res.json({ success: true, message: 'password updated successfully' });
 });
 
+/**
+ * POST /forgot-password
+ * Body: { email }
+ */
+const forgotPassword = asyncHandler(async (req, res) => {
+  const { message } = await PasswordResetService.requestPasswordReset({
+    email: req.body.email,
+    ip: req.ip,
+    userAgent: req.get('user-agent'),
+  });
+
+  return res.status(200).json({ success: true, message });
+});
+
+/**
+ * POST /complete-password-reset
+ * Body: { email, otp, newPassword }
+ */
+const completePasswordReset = asyncHandler(async (req, res) => {
+  const { message } = await PasswordResetService.completePasswordReset({
+    email: req.body.email,
+    otp: req.body.otp,
+    newPassword: req.body.newPassword,
+  });
+
+  return res.status(200).json({ success: true, message, returnTo: 'login' });
+});
+
 module.exports = {
   register,
   login,
@@ -155,4 +184,6 @@ module.exports = {
   userById,
   deleteUser,
   resetPassword,
+  forgotPassword,
+  completePasswordReset,
 };
